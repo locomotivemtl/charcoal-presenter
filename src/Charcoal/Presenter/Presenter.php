@@ -26,10 +26,10 @@ class Presenter
      * @var string $getterPattern
      */
     private $getterPattern;
-    
+
     /**
-     * @param array|Traversable|callable $transformer The data-view transformation array (or Traversable) object.
-     * @param string $getterPattern The string pattern to match string with. Must have a single catch-block.
+     * @param array|Traversable|callable $transformer   The data-view transformation array (or Traversable) object.
+     * @param string                     $getterPattern The string pattern to match string with. Must have a single catch-block.
      */
     public function __construct($transformer, $getterPattern = '~{{(\w*?)}}~')
     {
@@ -39,8 +39,8 @@ class Presenter
 
     /**
      * @param array|Traversable|callable $transformer The data-view transformation array (or Traversable) object.
-     * @param string 
-     * @throws InvalidArgumentException If the provided transformer is not valid
+     * @throws InvalidArgumentException If the provided transformer is not valid.
+     * @return void
      */
     private function setTransformer($transformer)
     {
@@ -56,7 +56,7 @@ class Presenter
             );
         }
     }
-    
+
     /**
      * TheT Transformer class is callable. Its purpose is to transform a model (object) into view data.
      *
@@ -70,13 +70,14 @@ class Presenter
         $transformer = $this->transformer;
         return $this->transmogrify($obj, $transformer($obj));
     }
-    
+
     /**
-     * Transmogrify an object into an other structure
+     * Transmogrify an object into an other structure.
      *
-     * @param mixed $obj Source object
-     * @param mixed $val Modifier
-     * @throws 
+     * @param mixed $obj Source object.
+     * @param mixed $val Modifier.
+     * @throws InvalidArgumentException If the modifier is not callable, traversable (array) or string.
+     * @return mixed The transformed data (type depends on modifier).
      */
     private function transmogrify($obj, $val)
     {
@@ -84,7 +85,7 @@ class Presenter
         if (is_callable($val)) {
             return $val($obj);
         }
-    
+
         // Arrays or traversables are handled recursively.
         // This also converts / casts any Traversable into a simple array.
         if (is_array($val) || $val instanceof Traversable) {
@@ -98,14 +99,14 @@ class Presenter
             }
             return $data;
         }
-        
+
         // Strings are handled by rendering {{property}} with dynamic object getter.
         if (is_string($val)) {
             return preg_replace_callback($this->getterPattern, function(array $matches) use ($obj) {
                 return $this->objectGet($obj, $matches[1]);
             }, $val);
         }
-        
+
         // Any other
         throw new InvalidArgumentException(
             sprintf(
@@ -114,7 +115,7 @@ class Presenter
             )
         );
     }
-    
+
     /**
      * General-purpose dynamic object "getter".
      *
@@ -126,8 +127,8 @@ class Presenter
      * - Array access, if available (`$obj[property]`)
      * - Returns the property unchanged, otherwise
      *
-     * @param mixed  $obj      The model (object or array) to retrieve the property's value from.
-     * @param string $property The property name (key) to retrieve from model.
+     * @param mixed  $obj          The model (object or array) to retrieve the property's value from.
+     * @param string $propertyName The property name (key) to retrieve from model.
      * @throws InvalidArgumentException If the property name is not a string.
      * @return mixed The object property, if available. The property name, unchanged, if it's not available.
      */
@@ -136,15 +137,15 @@ class Presenter
         if (is_callable([$obj, $propertyName])) {
             return $obj->{$propertyName}();
         }
-        
+
         if (isset($obj->{$propertyName})) {
             return $obj->{$propertyName};
         }
-        
+
         if ((is_array($obj) || $obj instanceof ArrayAccess) && isset($obj[$propertyName])) {
             return $obj[$propertyName];
         }
-        
+
         return $propertyName;
     }
 }
