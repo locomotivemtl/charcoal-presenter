@@ -2,10 +2,9 @@
 
 namespace Charcoal\Tests\Presenter;
 
-use \Charcoal\Presenter\Presenter;
+use Exception;
 
-use \Charcoal\Tests\Presenter\TestTransformer;
-use \Charcoal\Tests\Presenter\TestModel;
+use Charcoal\Presenter\Presenter;
 
 /**
  *
@@ -29,7 +28,6 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
         $presenter = new Presenter($transformer);
         $this->assertEquals($expected, $presenter->transform(new TestModel()));
-    
     }
 
     /**
@@ -39,19 +37,39 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
     {
         $transformer = [
             'id',
-            'name'
+            'name',
+            'nested',
+            'nested2' => [
+                2,
+                4
+            ],
+            'boolean',
+            'boolean2'  => true,
+            'numeric'   => 42
         ];
 
         $model = [
             'id'=>1,
             'name'=>'Foobar',
             'unused'=>42,
-            'unused2'=>'allo'
+            'unused2'=>'allo',
+            'boolean' => false,
+            'nested' => [
+                'foo' => 'bar'
+            ],
         ];
 
         $expected = [
             'id'=>1,
-            'name'=>'Foobar'
+            'name'=>'Foobar',
+            'nested' => $model['nested'],
+            'nested2' => [
+                2,
+                4
+            ],
+            'boolean' => false,
+            'boolean2' => true,
+            'numeric' => 42
         ];
 
         $presenter = new Presenter($transformer);
@@ -112,8 +130,21 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidTransformerThrowsException()
     {
-        $this->setExpectedException('\Exception');
+        $this->setExpectedException(Exception::class);
         $presenter = new Presenter('foo');
+    }
+
+    public function testInvalidPropertyThrowsException()
+    {
+        $transformer = [
+            'foo' => new \StdClass()
+        ];
+        $model = [
+            'bar' => 'baz'
+        ];
+        $presenter = new Presenter($transformer);
+        $this->setExpectedException(Exception::class);
+        $presenter->transform($model);
     }
 
     public function testStringProperty()
@@ -141,7 +172,7 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
     {
         $transformer = [
             'initials' => function($model) {
-                
+
                 $first = substr($model['firstname'], 0, 1);
                 $last = substr($model['lastname'], 0, 1);
                 return $first.'. '.$last.'.';
@@ -158,22 +189,6 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
         $presenter = new Presenter($transformer);
         $this->assertEquals($expected, $presenter->transform($model));
-    }
-
-    public function testInvalidPropertyThrowsException()
-    {
-        $transformer = [
-            'id' => false
-        ];
-
-        $model = [
-            'id'=>1
-        ];
-
-        $presenter = new Presenter($transformer);
-
-        $this->setExpectedException('\Exception');
-        $presenter->transform($model);
     }
 
     public function testCustomStringPattern()

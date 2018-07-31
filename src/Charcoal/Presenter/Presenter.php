@@ -92,7 +92,11 @@ class Presenter
             $data = [];
             foreach ($val as $k => $v) {
                 if (!is_string($k)) {
-                    $data[$v] = $this->objectGet($obj, $v);
+                    if (is_string($v)) {
+                        $data[$v] = $this->objectGet($obj, $v);
+                    } else {
+                        $data[] = $v;
+                    }
                 } else {
                     $data[$k] = $this->transmogrify($obj, $v);
                 }
@@ -105,6 +109,14 @@ class Presenter
             return preg_replace_callback($this->getterPattern, function(array $matches) use ($obj) {
                 return $this->objectGet($obj, $matches[1]);
             }, $val);
+        }
+
+        if (is_numeric($val)) {
+            return $val;
+        }
+
+        if (is_bool($val)) {
+            return !!$val;
         }
 
         // Any other
@@ -142,7 +154,7 @@ class Presenter
             return $obj->{$propertyName};
         }
 
-        if ((is_array($obj) || $obj instanceof ArrayAccess) && isset($obj[$propertyName])) {
+        if (is_string($propertyName) && (is_array($obj) || $obj instanceof ArrayAccess) && isset($obj[$propertyName])) {
             return $obj[$propertyName];
         }
 
