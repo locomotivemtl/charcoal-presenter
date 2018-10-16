@@ -2,9 +2,9 @@
 
 namespace Charcoal\Presenter;
 
-use \ArrayAccess;
-use \InvalidArgumentException;
-use \Traversable;
+use ArrayAccess;
+use InvalidArgumentException;
+use Traversable;
 
 /**
  * Presenter provides a presentation and transformation layer for a "model".
@@ -104,7 +104,7 @@ class Presenter
             return $data;
         }
 
-        // Strings are handled by rendering {{property}} with dynamic object getter.
+        // Strings are handled by rendering {{property}}  with dynamic object getter pattern.
         if (is_string($val)) {
             return preg_replace_callback($this->getterPattern, function(array $matches) use ($obj) {
                 return $this->objectGet($obj, $matches[1]);
@@ -122,7 +122,7 @@ class Presenter
         // Any other
         throw new InvalidArgumentException(
             sprintf(
-                'Transmogrify val needs to be callable, traversable (array) or a string. "%s" given.',
+                'Presenter\'s transmogrify val needs to be callable, traversable (array) or a string. "%s" given.',
                 gettype($val)
             )
         );

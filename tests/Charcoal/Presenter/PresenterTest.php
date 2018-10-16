@@ -130,7 +130,7 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidTransformerThrowsException()
     {
-        $this->setExpectedException(Exception::class);
+        $this->expectException(Exception::class);
         $presenter = new Presenter('foo');
     }
 
@@ -143,7 +143,7 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
             'bar' => 'baz'
         ];
         $presenter = new Presenter($transformer);
-        $this->setExpectedException(Exception::class);
+        $this->expectException(Exception::class);
         $presenter->transform($model);
     }
 
