@@ -172,7 +172,6 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
     {
         $transformer = [
             'initials' => function($model) {
-
                 $first = substr($model['firstname'], 0, 1);
                 $last = substr($model['lastname'], 0, 1);
                 return $first.'. '.$last.'.';
