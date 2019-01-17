@@ -156,12 +156,13 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
         $model = [
             'firstname'=>'James',
-            'lastname'=>'Bond'
+            'lastname'=>'Bond',
+            'extra' => 'extra cool'
         ];
 
         $expected = [
             'fullname' => 'James Bond',
-            'extra' => 'This is an extra string'
+            'extra' => 'This is an extra cool string'
         ];
 
         $presenter = new Presenter($transformer);
@@ -209,5 +210,35 @@ class PresenterTest extends \PHPUnit\Framework\TestCase
 
         $presenter = new Presenter($transformer, $getterPattern);
         $this->assertEquals($expected, $presenter->transform($model));
+    }
+
+    public function testNullValue()
+    {
+        $transformer = [
+            'x',
+            'y' => null
+        ];
+
+        $model = [
+            'x' => null
+        ];
+
+
+        $presenter = new Presenter($transformer);
+        $this->assertEquals(['x'=>null, 'y'=>null], $presenter->transform($model));
+    }
+
+    public function testInvalidKey()
+    {
+        $transformer = [
+            'x' => '{{invalid}}This is {{x}}'
+        ];
+
+        $model = [
+            'x' => 'foo'
+        ];
+
+        $presenter = new Presenter($transformer);
+        $this->assertEquals(['x'=>'This is foo'], $presenter->transform($model));
     }
 }

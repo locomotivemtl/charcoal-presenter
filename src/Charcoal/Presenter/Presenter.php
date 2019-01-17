@@ -119,6 +119,10 @@ class Presenter
             return !!$val;
         }
 
+        if ($val === null) {
+            return null;
+        }
+
         // Any other
         throw new InvalidArgumentException(
             sprintf(
@@ -154,10 +158,10 @@ class Presenter
             return $obj->{$propertyName};
         }
 
-        if (is_string($propertyName) && (is_array($obj) || $obj instanceof ArrayAccess) && isset($obj[$propertyName])) {
+        if (is_string($propertyName) && (is_array($obj) || $obj instanceof ArrayAccess) && (isset($obj[$propertyName]))) {
             return $obj[$propertyName];
         }
 
-        return $propertyName;
+        return null;
     }
 }
