@@ -82,7 +82,7 @@ class Presenter
     private function transmogrify($obj, $val)
     {
         // Callbacks (lambda or callable) are supported. They must accept the source object as argument.
-        if (is_callable($val)) {
+        if (!is_string($val) && is_callable($val)) {
             return $val($obj);
         }
 
