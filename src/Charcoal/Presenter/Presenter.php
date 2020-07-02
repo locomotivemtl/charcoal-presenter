@@ -73,7 +73,8 @@ class Presenter
     }
 
     /**
-     * @param mixed $collection
+     * @param mixed $collection A collection or array to transform.
+     * @return array
      */
     public function transformCollection($collection)
     {
