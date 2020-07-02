@@ -3,6 +3,7 @@
 namespace Charcoal\Presenter;
 
 use ArrayAccess;
+use Charcoal\Model\CollectionInterface;
 use InvalidArgumentException;
 use Traversable;
 
@@ -69,6 +70,22 @@ class Presenter
     {
         $transformer = $this->transformer;
         return $this->transmogrify($obj, $transformer($obj));
+    }
+
+    /**
+     * @param mixed $collection
+     */
+    public function transformCollection($collection)
+    {
+        $array = [];
+
+        if ($collection instanceof CollectionInterface) {
+            $array = $collection->values();
+        } elseif (is_array($collection)) {
+            $array = $collection;
+        }
+
+        return array_map([$this, 'transform'], $array);
     }
 
     /**
